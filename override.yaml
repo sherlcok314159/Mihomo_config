@@ -1,0 +1,499 @@
+# 个人自用的 clash Mihomo 配置文件，请阅读理解后使用！
+
+# 该配置得到了以下项目的启发和帮助，排名不分先后
+# Sukka 关于规则集的相关配置: https://blog.skk.moe/post/i-have-my-unique-surge-setup/
+# yyhhyy 在 Mihomo party 的配置教程: https://iyyh.net/archives/3c8e34c1-1493-48bb-9359-fb5f00853500
+# Mihomo 官方文档: https://wiki.metacubex.one
+# Mihomo 官方的规则 geodata 集合: https://github.com/MetaCubeX/meta-rules-dat
+# Loyalsoldier 的 geodata 集合:
+# 1. https://github.com/Loyalsoldier/v2ray-rules-dat
+# 2. https://github.com/Loyalsoldier/geoip
+# VirgilClyne 关于 ASN 的介绍: https://github.com/VirgilClyne/GetSomeFries/wiki/%F0%9F%8C%90-ASN#%E7%AE%80%E4%BB%8B
+# crazy-max 提供屏蔽 Windows 隐私以及更新的域名: https://github.com/crazy-max/WindowsSpyBlocker
+# 学术规则来源自 hexiao 的博客：
+# https://hexiao2001.github.io/2024/12/02/clash%E8%AE%A2%E9%98%85%E8%A7%84%E5%88%99%E6%89%A9%E5%B1%95/
+# 策略组的图标来自于: https://github.com/Orz-3/mini
+# geodata 中的 tracker 来自于 https://trackerslist.com/ 以及 https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Clash/PrivateTracker
+# Sing-Box: https://github.com/SagerNet/sing-box
+# 同时感谢对 Mihomo 内核客户端开发的贡献者
+# Clash Verge Rev: https://github.com/clash-verge-rev/clash-verge-rev/
+# Clash Meta for Android: https://github.com/MetaCubeX/ClashMetaForAndroid
+
+profile:
+  # 储存 API 对策略组的选择，以供下次启动时使用
+  store-selected: true
+  # 储存 fakeip 映射表，域名再次发生连接时，使用原有映射地址
+  store-fake-ip: true
+# 全局 TLS 指纹，优先低于 proxy 内的 client-fingerprint
+# 支持 TLS 传输的 TCP/grpc/WS/HTTP, 支持协议有 VLESS, Vmess 和 Trojan
+global-client-fingerprint: chrome
+
+# 用 dat 格式文件来加载 geoip，默认为 false，用 mmdb 格式文件
+geodata-mode: true
+geo-auto-update: true # 自动更新 geodata
+geo-update-interval: 24 # 24 小时更新一次
+# 自定义 geodata 的加载地址
+geox-url:
+  # geoip，geosite 存储的是 IP 和域名对应的分组，可能是国家，也可能是某些分组，比如广告
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  # 这里用 dat 就没必要配置 mmdb
+  # ASN 指的是一些注册的企业，机构和个人，参见 https://github.com/VirgilClyne/GetSomeFries/wiki/%F0%9F%8C%90-ASN#%E7%AE%80%E4%BB%8B
+  asn: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb"
+
+ipv6: true
+dns:
+  enable: true
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  # 配置不使用 fake-ip 的域名，代理跳过解析，让系统自己解析
+  fake-ip-filter:
+    - "*" # 只匹配 localhost 等没有. 的主机名
+    - "*.lan"
+    - "xbox.*.microsoft.com"
+    - "+.xboxlive.com"
+    - "localhost.ptlogin2.qq.com"
+  nameserver:
+    - https://223.5.5.5/dns-query # 阿里
+    - https://120.53.53.53/dns-query # 腾讯
+    # 如果 IP 有变，备用：
+    # - https://dns.alidns.com/dns-query
+    # - https://doh.pub/dns-query
+  fallback:
+    - "https://dns.cloudflare.com/dns-query"
+    - "https://dns.google/dns-query"
+
+  # 如果满足了 filter 的条件，就用 nameserver 的解析结果
+  # 否则就用 fallback 的解析结果
+  fallback-filter:
+    geoip-code: CN
+
+  # 匹配到相关域名，优先用指定的 DNS 服务器解析
+  # 原则上来说，不建议针对很多来优先解析，因为有时候可能会解析失败
+  # 比如我将 bilibili.com 全部送给腾讯，就出现过解析失败的情况
+  # 所以这里只是简单的国内外分开，国内用阿里腾讯，国外用 Cloudflare 和 Google
+  # 一般是内网解析需要特别设置
+  nameserver-policy:
+    # private 其实指的是 Reserved IP（保留地址），比如 192.168.0.0
+    "geosite:cn,private":
+      - https://223.5.5.5/dns-query # 阿里
+      - https://120.53.53.53/dns-query # 腾讯
+    "geosite:geolocation-!cn": # 已经包含了 gfw 类
+      - "https://dns.cloudflare.com/dns-query"
+      - "https://dns.google/dns-query"
+
+hosts:
+
+# 节点筛选组
+# 筛选了香港，日本，韩国，新加坡，美国，英国，法国，德国，台湾，马来西亚，泰国，越南，土耳其，阿根廷
+# 你的机场可能不一定全有，也没关系，不会报错
+FilterSelfHost: &FilterSelfHost "^自建.*" # 个人自建节点
+# 匹配以香港或 HK 或 Hong 或 🇭🇰 等开头，但不出现网站...节点等词
+FilterHK: &FilterHK "^(?=.*(香港|HK|Hong|🇭🇰))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterJP: &FilterJP "^(?=.*(日本|JP|Japan|🇯🇵))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterKR: &FilterKR "^(?=.*(韩国|韓|KR|Korea|🇰🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterSG: &FilterSG "^(?=.*(新加坡|狮城|SG|Singapore|🇸🇬))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterUS: &FilterUS "^(?=.*(美国|US|United States|America|🇺🇸))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterUK: &FilterUK "^(?=.*(英国|UK|United Kingdom|🇬🇧))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterFR: &FilterFR "^(?=.*(法国|FR|France|🇫🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterDE: &FilterDE "^(?=.*(德国|DE|Germany|🇩🇪))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterTW: &FilterTW "^(?=.*(台湾|TW|Taiwan|Wan|🇹🇼|🇨🇳))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterMY: &FilterMY "^(?=.*(马来西亚|MY|Malaysia|🇲🇾))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterTH: &FilterTH "^(?=.*(泰国|TH|Thailand|🇹🇭))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterVN: &FilterVN "^(?=.*(越南|VN|Vietnam|🇻🇳))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterTR: &FilterTR "^(?=.*(土耳其|TR|Turkey|🇹🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterAR: &FilterAR "^(?=.*(阿根廷|AR|Argentina|🇦🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterOthers: &FilterOthers "^(?!.*(🇭🇰|HK|Hong|香港|台湾|🇹🇼|TW|Taiwan|Wan|🇯🇵|JP|Japan|日本|🇸🇬|SG|新加坡|Singapore|狮城|🇺🇸|US|United States|America|美国|🇩🇪|DE|Germany|德国|🇬🇧|UK|United Kingdom|英国|🇰🇷|KR|Korea|韩国|韓|🇫🇷|FR|France|法国|马来西亚|MYS|Malaysia|🇲🇾|泰国|TH|Thailand|🇹🇭|越南|VN|Vietnam|🇻🇳|土耳其|TR|Turkey|🇹🇷|阿根廷|AR|Argentina|🇦🇷)).*$"
+FilterAll: &FilterAll '^(?=.*(.))(?!.*((?i)群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\b|(\d{4}-\d{2}-\d{2}|\d+G)))).*$'
+
+# 策略组参数锚点
+# 手动选择参数
+Select:
+  &Select {
+    type: select,
+    url: "https://cp.cloudflare.com",
+    disable-udp: false,
+    hidden: false,
+    include-all: true,
+  }
+# 自动测速参数
+Auto:
+  &Auto {
+    type: url-test,
+    url: "https://cp.cloudflare.com",
+    interval: 300,
+    tolerance: 50,
+    disable-udp: false,
+    hidden: true,
+    include-all: true,
+  }
+
+# 策略组
+proxy-groups:
+  - name: 节点选择
+    type: select
+    proxies: [自动选择, 🛠️ - 自动选择, 手动选择, DIRECT]
+    url: https://cp.cloudflare.com
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Static.png
+
+  - name: 自动选择
+    type: select
+    proxies: [🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    url: https://cp.cloudflare.com
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Urltest.png
+
+  - name: 手动选择
+    type: select
+    proxies: [🇭🇰 - 手动选择, 🛠️ - 手动选择, 🇯🇵 - 手动选择, 🇰🇷 - 手动选择, 🇸🇬 - 手动选择, 🇺🇸 - 手动选择, 🇬🇧 - 手动选择, 🇫🇷 - 手动选择, 🇩🇪 - 手动选择, 🇹🇼 - 手动选择, 🇲🇾 - 手动选择, 🇹🇭 - 手动选择, 🇻🇳 - 手动选择, 🇹🇷 - 手动选择, 🇦🇷 - 手动选择, Others - 手动选择]
+    url: https://cp.cloudflare.com
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Cylink.png
+
+  - name: Telegram
+    type: select
+    proxies: [🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Telegram.png
+
+  # 关于 CDN 的节点，尽可能选更快以及更便宜的节点（比如低倍的）
+  # 当然，有些情况可以直连
+  - name: CDN节点
+    type: select
+    proxies: [🛠️ - 自动选择, DIRECT, 🇭🇰 - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://cdn.jsdelivr.net/gh/sherlcok314159/Files_@main/car-solid.svg
+
+  # 避免 HK 的一些推荐和骗子
+  - name: Twitter
+    type: select
+    proxies: [🇯🇵 - 自动选择, 🛠️ - 自动选择, 🇭🇰 - 自动选择, 🇹🇼 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Twitter.png
+
+  # 我 Spotify 注册的就是日区
+  - name: Spotify
+    type: select
+    proxies: [🇯🇵 - 自动选择, 🛠️ - 自动选择, 🇭🇰 - 自动选择, 🇹🇼 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Spotify.png
+
+  - name: YouTube
+    type: select
+    proxies: [🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/YouTube.png
+
+  # 默认国区
+  - name: Bilibili
+    type: select
+    proxies: [DIRECT, 🇹🇼 - 自动选择, 🇭🇰 - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Bili.png
+
+  - name: TikTok
+    type: select
+    proxies: [🇯🇵 - 自动选择, 🛠️ - 自动选择, 🇹🇼 - 自动选择, 🇭🇰 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/TikTok.png
+
+  - name: Amazon
+    type: select
+    proxies: [🇺🇸 - 自动选择, 🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://cdn.jsdelivr.net/gh/sherlcok314159/Files_@main/amazon-brands-solid_color.svg
+
+  # AIGC 屏蔽港澳台
+  - name: AIGC
+    type: select
+    proxies: [🇺🇸 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇭🇰 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/OpenAI.png
+
+  - name: 苹果服务
+    type: select
+    proxies: [DIRECT, 🇺🇸 - 自动选择, 🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Apple.png
+
+  - name: 微软服务
+    type: select
+    proxies: [DIRECT, 🇺🇸 - 自动选择, 🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Microsoft.png
+
+  - name: Academic
+    type: select
+    proxies: [DIRECT]
+    icon: https://cdn.jsdelivr.net/gh/sherlcok314159/Files_@main/book-open-solid_color.svg
+
+  # 自动选择
+  - { name: 🇭🇰 - 自动选择, <<: *Auto, filter: *FilterHK }
+  - { name: 🇯🇵 - 自动选择, <<: *Auto, filter: *FilterJP }
+  - { name: 🛠️ - 自动选择, <<: *Auto, filter: *FilterSelfHost }
+  - { name: 🇰🇷 - 自动选择, <<: *Auto, filter: *FilterKR }
+  - { name: 🇸🇬 - 自动选择, <<: *Auto, filter: *FilterSG }
+  - { name: 🇺🇸 - 自动选择, <<: *Auto, filter: *FilterUS }
+  - { name: 🇬🇧 - 自动选择, <<: *Auto, filter: *FilterUK }
+  - { name: 🇫🇷 - 自动选择, <<: *Auto, filter: *FilterFR }
+  - { name: 🇩🇪 - 自动选择, <<: *Auto, filter: *FilterDE }
+  - { name: 🇹🇼 - 自动选择, <<: *Auto, filter: *FilterTW }
+  - { name: 🇲🇾 - 自动选择, <<: *Auto, filter: *FilterMY }
+  - { name: 🇹🇭 - 自动选择, <<: *Auto, filter: *FilterTH }
+  - { name: 🇻🇳 - 自动选择, <<: *Auto, filter: *FilterVN }
+  - { name: 🇹🇷 - 自动选择, <<: *Auto, filter: *FilterTR }
+  - { name: 🇦🇷 - 自动选择, <<: *Auto, filter: *FilterAR }
+
+  # 手动选择
+  - { name: 🇭🇰 - 手动选择, <<: *Select, filter: *FilterHK }
+  - { name: 🇯🇵 - 手动选择, <<: *Select, filter: *FilterJP }
+  - { name: 🛠️ - 手动选择, <<: *Select, filter: *FilterSelfHost }
+  - { name: 🇰🇷 - 手动选择, <<: *Select, filter: *FilterKR }
+  - { name: 🇸🇬 - 手动选择, <<: *Select, filter: *FilterSG }
+  - { name: 🇺🇸 - 手动选择, <<: *Select, filter: *FilterUS }
+  - { name: 🇬🇧 - 手动选择, <<: *Select, filter: *FilterUK }
+  - { name: 🇫🇷 - 手动选择, <<: *Select, filter: *FilterFR }
+  - { name: 🇩🇪 - 手动选择, <<: *Select, filter: *FilterDE }
+  - { name: 🇹🇼 - 手动选择, <<: *Select, filter: *FilterTW }
+  - { name: 🇲🇾 - 手动选择, <<: *Select, filter: *FilterMY }
+  - { name: 🇹🇭 - 手动选择, <<: *Select, filter: *FilterTH }
+  - { name: 🇻🇳 - 手动选择, <<: *Select, filter: *FilterVN }
+  - { name: 🇹🇷 - 手动选择, <<: *Select, filter: *FilterTR }
+  - { name: 🇦🇷 - 手动选择, <<: *Select, filter: *FilterAR }
+  - { name: Others - 手动选择, <<: *Select, filter: *FilterOthers }
+
+  # 全部节点
+  - { name: AllIn - 手动选择, <<: *Select, filter: *FilterAll }
+  - { name: AllIn - 自动选择, <<: *Auto, filter: *FilterAll }
+
+# 规则参数 [每12小时更新一次订阅规则，更新规则时使用（节点选择）策略]
+RuleSet_classical:
+  &RuleSet_classical {
+    type: http,
+    behavior: classical,
+    interval: 43200,
+    format: text,
+    proxy: 节点选择,
+  }
+RuleSet_domain:
+  &RuleSet_domain {
+    type: http,
+    behavior: domain,
+    interval: 43200,
+    format: text,
+    proxy: 节点选择,
+  }
+RuleSet_ipcidr:
+  &RuleSet_ipcidr {
+    type: http,
+    behavior: ipcidr,
+    interval: 43200,
+    format: text,
+    proxy: 节点选择,
+  }
+
+# 订阅规则
+rule-providers:
+  reject_non_ip_no_drop:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/reject-no-drop.txt
+    path: ./rule_set/sukkaw_ruleset/reject_non_ip_no_drop.txt
+
+  reject_non_ip_drop:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt
+    path: ./rule_set/sukkaw_ruleset/reject_non_ip_drop.txt
+
+  reject_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/reject.txt
+    path: ./rule_set/sukkaw_ruleset/reject_non_ip.txt
+
+  reject_domainset:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/domainset/reject.txt
+    path: ./rule_set/sukkaw_ruleset/reject_domainset.txt
+
+  reject_extra_domainset:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/domainset/reject_extra.txt
+    path: ./sukkaw_ruleset/reject_domainset_extra.txt
+
+  reject_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/ip/reject.txt
+    path: ./rule_set/sukkaw_ruleset/reject_ip.txt
+
+  cdn_domainset:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/domainset/cdn.txt
+    path: ./rule_set/sukkaw_ruleset/cdn_domainset.txt
+
+  cdn_non_ip:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/non_ip/cdn.txt
+    path: ./rule_set/sukkaw_ruleset/cdn_non_ip.txt
+
+  # 所有流媒体
+  stream_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/stream.txt
+    path: ./rule_set/sukkaw_ruleset/stream_non_ip.txt
+  stream_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/ip/stream.txt
+    path: ./rule_set/sukkaw_ruleset/stream_ip.txt
+
+  ai_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/ai.txt
+    path: ./rule_set/sukkaw_ruleset/ai_non_ip.txt
+
+  telegram_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/telegram.txt
+    path: ./rule_set/sukkaw_ruleset/telegram_non_ip.txt
+
+  telegram_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/ip/telegram.txt
+    path: ./rule_set/sukkaw_ruleset/telegram_ip.txt
+
+  # 带 CDN 和 CN 都指的是国内可以直连的，默认策略是直连
+  apple_cdn:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/domainset/apple_cdn.txt
+    path: ./rule_set/sukkaw_ruleset/apple_cdn.txt
+
+  apple_services:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/apple_services.txt
+    path: ./rule_set/sukkaw_ruleset/apple_services.txt
+
+  apple_cn_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/apple_cn.txt
+    path: ./rule_set/sukkaw_ruleset/apple_cn_non_ip.txt
+
+  microsoft_cdn_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt
+    path: ./rule_set/sukkaw_ruleset/microsoft_cdn_non_ip.txt
+
+  microsoft_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/microsoft.txt
+    path: ./rule_set/sukkaw_ruleset/microsoft_non_ip.txt
+
+  # 软件更新、操作系统等大文件下载
+  download_domainset:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/domainset/download.txt
+    path: ./rule_set/sukkaw_ruleset/download_domainset.txt
+  download_non_ip:
+    <<: *RuleSet_domain
+    url: https://ruleset.skk.moe/Clash/non_ip/download.txt
+    path: ./rule_set/sukkaw_ruleset/download_non_ip.txt
+
+  # 内网域名和局域网 IP
+  lan_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/lan.txt
+    path: ./rule_set/sukkaw_ruleset/lan_non_ip.txt
+  lan_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/ip/lan.txt
+    path: ./rule_set/sukkaw_ruleset/lan_ip.txt
+
+  domestic_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/domestic.txt
+    path: ./rule_set/sukkaw_ruleset/domestic_non_ip.txt
+  direct_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/direct.txt
+    path: ./rule_set/sukkaw_ruleset/direct_non_ip.txt
+  global_non_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/non_ip/global.txt
+    path: ./rule_set/sukkaw_ruleset/global_non_ip.txt
+  domestic_ip:
+    <<: *RuleSet_classical
+    url: https://ruleset.skk.moe/Clash/ip/domestic.txt
+    path: ./rule_set/sukkaw_ruleset/domestic_ip.txt
+  china_ip:
+    <<: *RuleSet_ipcidr
+    url: https://ruleset.skk.moe/Clash/ip/china_ip.txt
+    path: ./rule_set/sukkaw_ruleset/china_ip.txt
+
+# 分流规则
+rules:
+  # 非 IP 类规则必须与 IP 类规则分开，避免不必要的 DNS 解析
+  # 先是拒绝类，优先级最高，引自 Sukka，包含 uBlock Origin、AdGuard、EasyList 等
+  - RULE-SET,reject_non_ip,REJECT
+  - RULE-SET,reject_domainset,REJECT
+  - RULE-SET,reject_extra_domainset,REJECT # 可能开启后对性能有影响
+  - RULE-SET,reject_non_ip_drop,REJECT-DROP
+  - RULE-SET,reject_non_ip_no_drop,REJECT
+
+  # 引自 crazy-max 的规则，WIN-SPY 和 WIN-EXTRA 是 Windows 的附加的隐私跟踪域名
+  # WIN-UPDATE 是 Windows 的自动更新域名
+  - GEOSITE,WIN-SPY,REJECT-DROP
+  - GEOSITE,WIN-EXTRA,REJECT-DROP
+  - GEOSITE,WIN-UPDATE,REJECT-DROP
+
+  # 根据 GEODATA 加的
+  - GEOSITE,DUCKDUCKGO,节点选择 # 单纯是经常用
+  - GEOSITE,TWITTER,Twitter
+  - GEOSITE,SPOTIFY,Spotify
+  - GEOSITE,TIKTOK,TikTok
+  - GEOSITE,YOUTUBE,YouTube
+  - GEOSITE,AMAZON,Amazon
+  - GEOSITE,BILIBILI,Bilibili
+  - GEOSITE,CATEGORY-PUBLIC-TRACKER,DIRECT # 公共 tracker
+  - GEOSITE,CATEGORY-PT,DIRECT # 私有 tracker
+
+  # Academic
+  - DOMAIN,tuchong.com,Academic
+  - DOMAIN-SUFFIX,taylorandfrancis.com,Academic
+  - DOMAIN,dl.acm.org,Academic
+  - DOMAIN,acm-prod.disqus.com,Academic
+  - DOMAIN-SUFFIX,sciencedirectassets.com,Academic
+  - DOMAIN-SUFFIX,readspeaker.com,Academic
+  - DOMAIN-SUFFIX,webofknowledge.com,Academic
+  - DOMAIN-KEYWORD,pubmed,Academic
+  - DOMAIN-KEYWORD,springer,Academic
+  - DOMAIN-KEYWORD,ieee,Academic
+  - DOMAIN-KEYWORD,elsevier,Academic
+  - DOMAIN-KEYWORD,sciencedirect,Academic
+  - DOMAIN-KEYWORD,nature,Academic
+  - DOMAIN-KEYWORD,tandfonline,Academic
+  - DOMAIN-SUFFIX,elsevier.com,Academic
+  - DOMAIN-SUFFIX,edu.cn,Academic
+  - DOMAIN-SUFFIX,webofscience.com,Academic
+  - DOMAIN-SUFFIX,tandfonline.com,Academic
+  - DOMAIN-SUFFIX,link.springer.com,Academic
+  - DOMAIN-SUFFIX,onlinelibrary.wiley.com,Academic
+  - DOMAIN-SUFFIX,sciencedirect.com,Academic
+  - DOMAIN-SUFFIX,taylorfrancis.com,Academic
+
+  # 选自 Sukka 的规则集
+  - RULE-SET,telegram_non_ip,Telegram
+  - RULE-SET,apple_cdn,DIRECT
+  - RULE-SET,apple_cn_non_ip,DIRECT
+  - RULE-SET,microsoft_cdn_non_ip,DIRECT
+  - RULE-SET,apple_services,苹果服务
+  - RULE-SET,microsoft_non_ip,微软服务
+  - RULE-SET,download_domainset,CDN节点
+  - RULE-SET,download_non_ip,CDN节点
+  - RULE-SET,cdn_domainset,CDN节点
+  - RULE-SET,cdn_non_ip,CDN节点
+  - RULE-SET,stream_non_ip,节点选择
+  - RULE-SET,ai_non_ip,AIGC
+  - RULE-SET,global_non_ip,节点选择
+  - RULE-SET,domestic_non_ip,DIRECT
+  - RULE-SET,direct_non_ip,DIRECT
+  - RULE-SET,lan_non_ip,DIRECT
+  - GEOSITE,CN,DIRECT
+
+  # IP 类规则
+  - RULE-SET,reject_ip,REJECT
+  - GEOIP,TWITTER,Twitter
+  - RULE-SET,telegram_ip,Telegram
+  - RULE-SET,stream_ip,节点选择
+  - RULE-SET,lan_ip,DIRECT
+  - RULE-SET,domestic_ip,DIRECT
+  - RULE-SET,china_ip,DIRECT
+  - GEOIP,LAN,DIRECT
+  - GEOIP,CN,DIRECT
+
+  # 兜底规则
+  - MATCH,节点选择
