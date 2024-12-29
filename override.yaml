@@ -89,7 +89,7 @@ hosts:
 # 筛选了香港，日本，韩国，新加坡，美国，英国，法国，德国，台湾，马来西亚，泰国，越南，土耳其，阿根廷
 # 你的机场可能不一定全有，也没关系，不会报错
 FilterSelfHost: &FilterSelfHost "^自建.*" # 个人自建节点
-# 匹配以香港或 HK 或 Hong 或 🇭🇰 等开头，但不出现网站...节点等词
+# 匹配以香港，或 HK，或 Hong 以及 🇭🇰 开头，并且`[网站, 地址, 剩余, ..., 节点]`等词没有出现过
 FilterHK: &FilterHK "^(?=.*(香港|HK|Hong|🇭🇰))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterJP: &FilterJP "^(?=.*(日本|JP|Japan|🇯🇵))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterKR: &FilterKR "^(?=.*(韩国|韓|KR|Korea|🇰🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
@@ -209,11 +209,6 @@ proxy-groups:
     type: select
     proxies: [DIRECT, 🇺🇸 - 自动选择, 🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
     icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Microsoft.png
-
-  - name: Academic
-    type: select
-    proxies: [DIRECT]
-    icon: https://cdn.jsdelivr.net/gh/sherlcok314159/Files_@main/book-open-solid_color.svg
 
   # 自动选择
   - { name: 🇭🇰 - 自动选择, <<: *Auto, filter: *FilterHK }
@@ -442,28 +437,28 @@ rules:
   - GEOSITE,CATEGORY-PT,DIRECT # 私有 tracker
 
   # Academic
-  - DOMAIN,tuchong.com,Academic
-  - DOMAIN-SUFFIX,taylorandfrancis.com,Academic
-  - DOMAIN,dl.acm.org,Academic
-  - DOMAIN,acm-prod.disqus.com,Academic
-  - DOMAIN-SUFFIX,sciencedirectassets.com,Academic
-  - DOMAIN-SUFFIX,readspeaker.com,Academic
-  - DOMAIN-SUFFIX,webofknowledge.com,Academic
-  - DOMAIN-KEYWORD,pubmed,Academic
-  - DOMAIN-KEYWORD,springer,Academic
-  - DOMAIN-KEYWORD,ieee,Academic
-  - DOMAIN-KEYWORD,elsevier,Academic
-  - DOMAIN-KEYWORD,sciencedirect,Academic
-  - DOMAIN-KEYWORD,nature,Academic
-  - DOMAIN-KEYWORD,tandfonline,Academic
-  - DOMAIN-SUFFIX,elsevier.com,Academic
-  - DOMAIN-SUFFIX,edu.cn,Academic
-  - DOMAIN-SUFFIX,webofscience.com,Academic
-  - DOMAIN-SUFFIX,tandfonline.com,Academic
-  - DOMAIN-SUFFIX,link.springer.com,Academic
-  - DOMAIN-SUFFIX,onlinelibrary.wiley.com,Academic
-  - DOMAIN-SUFFIX,sciencedirect.com,Academic
-  - DOMAIN-SUFFIX,taylorfrancis.com,Academic
+  - DOMAIN,tuchong.com,DIRECT
+  - DOMAIN-SUFFIX,taylorandfrancis.com,DIRECT
+  - DOMAIN,dl.acm.org,DIRECT
+  - DOMAIN,acm-prod.disqus.com,DIRECT
+  - DOMAIN-SUFFIX,sciencedirectassets.com,DIRECT
+  - DOMAIN-SUFFIX,readspeaker.com,DIRECT
+  - DOMAIN-SUFFIX,webofknowledge.com,DIRECT
+  - DOMAIN-KEYWORD,pubmed,DIRECT
+  - DOMAIN-KEYWORD,springer,DIRECT
+  - DOMAIN-KEYWORD,ieee,DIRECT
+  - DOMAIN-KEYWORD,elsevier,DIRECT
+  - DOMAIN-KEYWORD,sciencedirect,DIRECT
+  - DOMAIN-KEYWORD,nature,DIRECT
+  - DOMAIN-KEYWORD,tandfonline,DIRECT
+  - DOMAIN-SUFFIX,elsevier.com,DIRECT
+  - DOMAIN-SUFFIX,edu.cn,DIRECT
+  - DOMAIN-SUFFIX,webofscience.com,DIRECT
+  - DOMAIN-SUFFIX,tandfonline.com,DIRECT
+  - DOMAIN-SUFFIX,link.springer.com,DIRECT
+  - DOMAIN-SUFFIX,onlinelibrary.wiley.com,DIRECT
+  - DOMAIN-SUFFIX,sciencedirect.com,DIRECT
+  - DOMAIN-SUFFIX,taylorfrancis.com,DIRECT
 
   # 选自 Sukka 的规则集
   - RULE-SET,telegram_non_ip,Telegram
