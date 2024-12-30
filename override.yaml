@@ -421,9 +421,12 @@ rules:
 
   # 引自 crazy-max 的规则，WIN-SPY 和 WIN-EXTRA 是 Windows 的附加的隐私跟踪域名
   # WIN-UPDATE 是 Windows 的自动更新域名
-  - GEOSITE,WIN-SPY,REJECT-DROP
-  - GEOSITE,WIN-EXTRA,REJECT-DROP
-  - GEOSITE,WIN-UPDATE,REJECT-DROP
+  # 有些域名可能被误杀，可以通过 log 来进行补救
+  - DOMAIN-REGEX,outlook.office.*.com,DIRECT
+  - DOMAIN-SUFFIX,login.microsoftonline.com,DIRECT
+  - GEOSITE,WIN-SPY,REJECT
+  - GEOSITE,WIN-EXTRA,REJECT
+  - GEOSITE,WIN-UPDATE,REJECT
 
   # 根据 GEODATA 加的
   - GEOSITE,DUCKDUCKGO,节点选择 # 单纯是经常用
