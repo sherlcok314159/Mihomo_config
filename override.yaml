@@ -17,7 +17,7 @@
 # Sing-Box: https://github.com/SagerNet/sing-box
 # 同时感谢对 Mihomo 内核客户端开发的贡献者
 # Clash Verge Rev: https://github.com/clash-verge-rev/clash-verge-rev/
-# Clash Meta for Android: https://github.com/MetaCubeX/ClashMetaForAndroid
+# FlClash: https://github.com/chen08209/FlClash
 
 profile:
   # 储存 API 对策略组的选择，以供下次启动时使用
@@ -92,7 +92,7 @@ FilterSelfHost: &FilterSelfHost "^自建.*" # 个人自建节点
 # 匹配以香港，或 HK，或 Hong 以及 🇭🇰 开头，并且`[网站, 地址, 剩余, ..., 节点]`等词没有出现过
 FilterHK: &FilterHK "^(?=.*(香港|HK|Hong|🇭🇰))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterJP: &FilterJP "^(?=.*(日本|JP|Japan|🇯🇵))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
-FilterKR: &FilterKR "^(?=.*(韩国|韓|KR|Korea|🇰🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
+FilterKR: &FilterKR "^(?=.*(韩国|韩|KR|Korea|🇰🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterSG: &FilterSG "^(?=.*(新加坡|狮城|SG|Singapore|🇸🇬))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterUS: &FilterUS "^(?=.*(美国|US|United States|America|🇺🇸))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterUK: &FilterUK "^(?=.*(英国|UK|United Kingdom|🇬🇧))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
@@ -104,7 +104,7 @@ FilterTH: &FilterTH "^(?=.*(泰国|TH|Thailand|🇹🇭))^(?!.*(网站|地址|�
 FilterVN: &FilterVN "^(?=.*(越南|VN|Vietnam|🇻🇳))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterTR: &FilterTR "^(?=.*(土耳其|TR|Turkey|🇹🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
 FilterAR: &FilterAR "^(?=.*(阿根廷|AR|Argentina|🇦🇷))^(?!.*(网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$"
-FilterOthers: &FilterOthers "^(?!.*(🇭🇰|HK|Hong|香港|台湾|🇹🇼|TW|Taiwan|Wan|🇯🇵|JP|Japan|日本|🇸🇬|SG|新加坡|Singapore|狮城|🇺🇸|US|United States|America|美国|🇩🇪|DE|Germany|德国|🇬🇧|UK|United Kingdom|英国|🇰🇷|KR|Korea|韩国|韓|🇫🇷|FR|France|法国|马来西亚|MYS|Malaysia|🇲🇾|泰国|TH|Thailand|🇹🇭|越南|VN|Vietnam|🇻🇳|土耳其|TR|Turkey|🇹🇷|阿根廷|AR|Argentina|🇦🇷)).*$"
+FilterOthers: &FilterOthers "^(?!.*(🇭🇰|HK|Hong|香港|台湾|🇹🇼|TW|Taiwan|Wan|🇯🇵|JP|Japan|日本|🇸🇬|SG|新加坡|Singapore|狮城|🇺🇸|US|United States|America|美国|🇩🇪|DE|Germany|德国|🇬🇧|UK|United Kingdom|英国|🇰🇷|KR|Korea|韩国|韩|🇫🇷|FR|France|法国|马来西亚|MYS|Malaysia|🇲🇾|泰国|TH|Thailand|🇹🇭|越南|VN|Vietnam|🇻🇳|土耳其|TR|Turkey|🇹🇷|阿根廷|AR|Argentina|🇦🇷)).*$"
 FilterAll: &FilterAll '^(?=.*(.))(?!.*((?i)群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\b|(\d{4}-\d{2}-\d{2}|\d+G)))).*$'
 
 # 策略组参数锚点
@@ -159,7 +159,7 @@ proxy-groups:
   - name: CDN节点
     type: select
     proxies: [🛠️ - 自动选择, DIRECT, 🇭🇰 - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇺🇸 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
-    icon: https://cdn.jsdelivr.net/gh/sherlcok314159/Files_@main/car-solid.svg
+    icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Skicat.png
 
   # 避免 HK 的一些推荐和骗子
   - name: Twitter
@@ -192,7 +192,7 @@ proxy-groups:
   - name: Amazon
     type: select
     proxies: [🇺🇸 - 自动选择, 🇭🇰 - 自动选择, 🛠️ - 自动选择, 🇯🇵 - 自动选择, 🇰🇷 - 自动选择, 🇸🇬 - 自动选择, 🇬🇧 - 自动选择, 🇫🇷 - 自动选择, 🇩🇪 - 自动选择, 🇹🇼 - 自动选择, 🇲🇾 - 自动选择, 🇹🇭 - 自动选择, 🇻🇳 - 自动选择, 🇹🇷 - 自动选择, 🇦🇷 - 自动选择]
-    icon: https://cdn.jsdelivr.net/gh/sherlcok314159/Files_@main/amazon-brands-solid_color.svg
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Amazon.png
 
   # AIGC 屏蔽港澳台
   - name: AIGC
@@ -228,26 +228,22 @@ proxy-groups:
   - { name: 🇦🇷 - 自动选择, <<: *Auto, filter: *FilterAR }
 
   # 手动选择
-  - { name: 🇭🇰 - 手动选择, <<: *Select, filter: *FilterHK }
-  - { name: 🇯🇵 - 手动选择, <<: *Select, filter: *FilterJP }
-  - { name: 🛠️ - 手动选择, <<: *Select, filter: *FilterSelfHost }
-  - { name: 🇰🇷 - 手动选择, <<: *Select, filter: *FilterKR }
-  - { name: 🇸🇬 - 手动选择, <<: *Select, filter: *FilterSG }
-  - { name: 🇺🇸 - 手动选择, <<: *Select, filter: *FilterUS }
-  - { name: 🇬🇧 - 手动选择, <<: *Select, filter: *FilterUK }
-  - { name: 🇫🇷 - 手动选择, <<: *Select, filter: *FilterFR }
-  - { name: 🇩🇪 - 手动选择, <<: *Select, filter: *FilterDE }
-  - { name: 🇹🇼 - 手动选择, <<: *Select, filter: *FilterTW }
-  - { name: 🇲🇾 - 手动选择, <<: *Select, filter: *FilterMY }
-  - { name: 🇹🇭 - 手动选择, <<: *Select, filter: *FilterTH }
-  - { name: 🇻🇳 - 手动选择, <<: *Select, filter: *FilterVN }
-  - { name: 🇹🇷 - 手动选择, <<: *Select, filter: *FilterTR }
-  - { name: 🇦🇷 - 手动选择, <<: *Select, filter: *FilterAR }
-  - { name: Others - 手动选择, <<: *Select, filter: *FilterOthers }
-
-  # 全部节点
-  - { name: AllIn - 手动选择, <<: *Select, filter: *FilterAll }
-  - { name: AllIn - 自动选择, <<: *Auto, filter: *FilterAll }
+  - { name: 🇭🇰 - 手动选择, <<: *Select, filter: *FilterHK, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png}
+  - { name: 🇯🇵 - 手动选择, <<: *Select, filter: *FilterJP, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/JP.png}
+  - { name: 🛠️ - 手动选择, <<: *Select, filter: *FilterSelfHost, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/Personal.png}
+  - { name: 🇰🇷 - 手动选择, <<: *Select, filter: *FilterKR, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/KR.png}
+  - { name: 🇸🇬 - 手动选择, <<: *Select, filter: *FilterSG, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/SG.png}
+  - { name: 🇺🇸 - 手动选择, <<: *Select, filter: *FilterUS, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/US.png}
+  - { name: 🇬🇧 - 手动选择, <<: *Select, filter: *FilterUK, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/UK.png}
+  - { name: 🇫🇷 - 手动选择, <<: *Select, filter: *FilterFR, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/FR.png}
+  - { name: 🇩🇪 - 手动选择, <<: *Select, filter: *FilterDE, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/DE.png}
+  - { name: 🇹🇼 - 手动选择, <<: *Select, filter: *FilterTW, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/TW.png}
+  - { name: 🇲🇾 - 手动选择, <<: *Select, filter: *FilterMY, icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Malaysia.png}
+  - { name: 🇹🇭 - 手动选择, <<: *Select, filter: *FilterTH, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/TH.png}
+  - { name: 🇻🇳 - 手动选择, <<: *Select, filter: *FilterVN, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/VN.png}
+  - { name: 🇹🇷 - 手动选择, <<: *Select, filter: *FilterTR, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/TR.png}
+  - { name: 🇦🇷 - 手动选择, <<: *Select, filter: *FilterAR, icon: https://raw.githubusercontent.com/sherlcok314159/Files_/refs/heads/main/Argentina.png}
+  - { name: Others - 手动选择, <<: *Select, filter: *FilterOthers, icon: https://raw.githubusercontent.com/Orz-3/mini/master/Color/XD.png}
 
 # 规则参数 [每12小时更新一次订阅规则，更新规则时使用（节点选择）策略]
 RuleSet_classical:
