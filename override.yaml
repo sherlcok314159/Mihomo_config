@@ -55,11 +55,12 @@ dns:
     - "+.xboxlive.com"
     - "localhost.ptlogin2.qq.com"
   nameserver:
-    - https://223.5.5.5/dns-query # 阿里
-    - https://120.53.53.53/dns-query # 腾讯
-    # 如果 IP 有变，备用：
-    # - https://dns.alidns.com/dns-query
-    # - https://doh.pub/dns-query
+    # 不要用 IP
+    - https://dns.alidns.com/dns-query # 阿里
+    - https://doh.pub/dns-query # 腾讯
+  proxy-server-nameserver: # 代理服务器的 DNS 解析
+    - https://dns.alidns.com/dns-query # 阿里
+    - https://dns.cloudflare.com/dns-query # Cloudflare
   fallback:
     - "https://dns.cloudflare.com/dns-query"
     - "https://dns.google/dns-query"
@@ -77,12 +78,11 @@ dns:
   nameserver-policy:
     # private 其实指的是 Reserved IP（保留地址），比如 192.168.0.0
     "geosite:cn,private":
-      - https://223.5.5.5/dns-query # 阿里
-      - https://120.53.53.53/dns-query # 腾讯
+      - https://dns.alidns.com/dns-query # 阿里
+      - https://doh.pub/dns-query # 腾讯
     "geosite:geolocation-!cn": # 已经包含了 gfw 类
       - "https://dns.cloudflare.com/dns-query"
       - "https://dns.google/dns-query"
-
 hosts:
 
 # 节点筛选组
